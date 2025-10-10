@@ -158,7 +158,6 @@ def test_format_id(e2e_run, setup_test_files):
 
 
 @pytest.mark.tvdb
-@pytest.mark.xfail(strict=False)
 @pytest.mark.usefixtures("setup_test_dir")
 def test_format_id__tvdb(e2e_run, setup_test_files):
     setup_test_files("archer.2009.s10e07.webrip.x264-lucidtv.mp4")
@@ -211,3 +210,43 @@ def test_ambiguous_language_deletction(e2e_run, setup_test_files):
     )
     result = e2e_run("--batch", ".")
     assert result.code == 0
+
+
+@pytest.mark.usefixtures("setup_test_dir")
+def test_relocation_operation_copy(e2e_run, setup_test_files):
+    setup_test_files("aladdin.2019.avi")
+    result = e2e_run("--relocation-operation=copy", "--lower", ".")
+    assert result.code == 0
+    assert "aladdin (2019).avi" in result.out
+
+
+@pytest.mark.usefixtures("setup_test_dir")
+def test_relocation_operation_copy2(e2e_run, setup_test_files):
+    setup_test_files("aladdin.2019.avi")
+    result = e2e_run("--relocation-operation=copy-with-metadata", "--lower", ".")
+    assert result.code == 0
+    assert "aladdin (2019).avi" in result.out
+
+
+@pytest.mark.usefixtures("setup_test_dir")
+def test_relocation_operation_symlink(e2e_run, setup_test_files):
+    setup_test_files("aladdin.2019.avi")
+    result = e2e_run("--relocation-operation=symlink", "--lower", ".")
+    assert result.code == 0
+    assert "aladdin (2019).avi" in result.out
+
+
+@pytest.mark.usefixtures("setup_test_dir")
+def test_relocation_operation_hardlink(e2e_run, setup_test_files):
+    setup_test_files("aladdin.2019.avi")
+    result = e2e_run("--relocation-operation=hardlink", "--lower", ".")
+    assert result.code == 0
+    assert "aladdin (2019).avi" in result.out
+
+
+@pytest.mark.usefixtures("setup_test_dir")
+def test_relocation_operation_move(e2e_run, setup_test_files):
+    setup_test_files("aladdin.2019.avi")
+    result = e2e_run("--relocation-operation=move", "--lower", ".")
+    assert result.code == 0
+    assert "aladdin (2019).avi" in result.out

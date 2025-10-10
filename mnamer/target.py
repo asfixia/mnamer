@@ -1,9 +1,7 @@
-from __future__ import annotations
-
 import datetime as dt
-from os import path
+from os import path, symlink, link
 from pathlib import Path
-from shutil import move
+from shutil import move, copy, copy2
 from typing import Any, ClassVar
 
 from charset_normalizer import from_path
@@ -16,7 +14,7 @@ from mnamer.language import Language
 from mnamer.metadata import Metadata, MetadataEpisode, MetadataMovie
 from mnamer.providers import Provider
 from mnamer.setting_store import SettingStore
-from mnamer.types import MediaType, ProviderType
+from mnamer.types import MediaType, ProviderType, RelocateType
 from mnamer.utils import (
     crawl_in,
     filename_replace,
@@ -43,6 +41,14 @@ class Target:
 
     source: Path
     metadata: Metadata
+
+    _relocation_strategy = {
+        RelocateType.DEFAULT.value: move,
+        RelocateType.HARDLINK.value: link,
+        RelocateType.SYMBOLICLINK.value: symlink,
+        RelocateType.COPY2.value: copy2,
+        RelocateType.COPY.value: copy,
+    }
 
     def __init__(self, file_path: Path, settings: SettingStore | None = None):
         self.source = file_path
@@ -277,6 +283,7 @@ class Target:
         destination_path = Path(self.destination).resolve()
         destination_path.parent.mkdir(parents=True, exist_ok=True)
         try:
-            move(str(self.source), destination_path)
+            self._relocation_strategy[self._settings.relocation_strategy](
+                str(self.source), destination_path)
         except OSError as e:  # pragma: no cover
             raise MnamerException from e
