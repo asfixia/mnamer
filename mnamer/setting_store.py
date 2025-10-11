@@ -218,14 +218,14 @@ class SettingStore:
             help="--episode-format: set episode renaming format specification",
         ).as_dict(),
     )
-    relocation_strategy: Optional[Union[RelocateType, str]] = dataclasses.field(
-        default=RelocateType.DEFAULT.value,
+    relocation_strategy: str = dataclasses.field(
+        default=RelocateType.MOVE.value,
         metadata=SettingSpec(
             dest="relocation_strategy",
             choices=[ix.value for ix in RelocateType],
             flags=["--relocation-operation"],
             group=SettingType.PARAMETER,
-            help=f"--relocation-operation={'|'.join([ix.value for ix in RelocateType])}: when given, link, copy or move files. Default move.",
+            help=f"--relocation-operation={'|'.join([ix.value for ix in RelocateType])}: when given, link, copy or move files. Default move. (PS1: Symlink doesnt works on windows) (PS2: Hardlinks can only be created between folders on the same drive.)",
         )(),
     )
 

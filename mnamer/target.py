@@ -1,7 +1,8 @@
+from __future__ import annotations
+
 import datetime as dt
-from os import path, symlink, link
+from os import path
 from pathlib import Path
-from shutil import move, copy, copy2
 from typing import Any, ClassVar
 
 from charset_normalizer import from_path
@@ -41,14 +42,6 @@ class Target:
 
     source: Path
     metadata: Metadata
-
-    _relocation_strategy = {
-        RelocateType.DEFAULT.value: move,
-        RelocateType.HARDLINK.value: link,
-        RelocateType.SYMBOLICLINK.value: symlink,
-        RelocateType.COPY2.value: copy2,
-        RelocateType.COPY.value: copy,
-    }
 
     def __init__(self, file_path: Path, settings: SettingStore | None = None):
         self.source = file_path
@@ -283,7 +276,7 @@ class Target:
         destination_path = Path(self.destination).resolve()
         destination_path.parent.mkdir(parents=True, exist_ok=True)
         try:
-            self._relocation_strategy[self._settings.relocation_strategy](
-                str(self.source), destination_path)
+            relocate_strategy = RelocateType(self._settings.relocation_strategy).get_strategy()
+            relocate_strategy(str(self.source), destination_path)
         except OSError as e:  # pragma: no cover
             raise MnamerException from e
