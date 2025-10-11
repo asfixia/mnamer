@@ -219,9 +219,10 @@ class Target:
             except MnamerException:
                 pass
         try:
+            path_data["language"] = Language.parse(path_data["language"])
             Language.ensure_valid_for_tvdb(path_data["language"])
         except MnamerException:
-            path_data["language"] = self._settings.language
+            path_data["language"] = self._settings.language or Language.parse("eng")
         return path_data
 
     def _override_metadata_ids(self):
