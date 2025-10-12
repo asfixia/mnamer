@@ -35,17 +35,6 @@ class RelocateType(Enum):
     SYMBOLICLINK = "symlink"
     COPY = "copy"
     COPY2 = "copy-with-metadata"
-    def get_strategy(self):
-        from shutil import move, copy, copy2
-        from os import link, symlink
-        strategies = {
-            RelocateType.MOVE: move,
-            RelocateType.HARDLINK: link,
-            RelocateType.SYMBOLICLINK: symlink,
-            RelocateType.COPY: copy,
-            RelocateType.COPY2: copy2,
-        }
-        return strategies[self]
 
 
 class SettingType(Enum):
